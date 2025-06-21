@@ -1,6 +1,6 @@
 import * as React from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from "react-native";
-import { Heart } from "lucide-react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, Image } from "react-native";
+import { Heart, Calendar } from "lucide-react-native";
 import { supabase } from "../integrations/supabase/client";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -51,7 +51,7 @@ const FeedSection = () => {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "d MMM yyyy", { locale: es });
+      return format(new Date(dateString), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es });
     } catch (error) {
       return dateString.split('T')[0]; // Fallback format
     }
@@ -87,16 +87,40 @@ const FeedSection = () => {
           <View style={styles.messageList}>
             {letters.map((letter) => (
               <View key={letter.id} style={styles.messageCard}>
-                <View style={styles.messageHeader}>
-                  <Text style={styles.messageAuthor}>{letter.author}</Text>
-                  <Text style={styles.messageDate}>{formatDate(letter.created_at)}</Text>
+                {/* Header con autor y fecha */}
+                <View style={styles.cardHeader}>
+                  <View style={styles.authorContainer}>
+                    <Heart width={20} height={20} color="#9F1239" fill="#9F1239" />
+                    <Text style={styles.messageAuthor}>{letter.author}</Text>
+                  </View>
+                  
+                  <View style={styles.dateContainer}>
+                    <Calendar width={16} height={16} color="#7C3AED" />
+                    <Text style={styles.messageDate}>{formatDate(letter.created_at)}</Text>
+                  </View>
                 </View>
                 
-                <Text style={styles.messageContent}>{letter.message}</Text>
+                {/* Imagen de la carta (si existe) */}
+                {letter.image_url && (
+                  <View style={styles.imageContainer}>
+                    <Image 
+                      source={{ uri: letter.image_url }} 
+                      style={styles.messageImage}
+                      resizeMode="cover"
+                    />
+                  </View>
+                )}
                 
-                <View style={styles.messageLikes}>
-                  <Heart width={16} height={16} color="#E11D48" fill="#E11D48" />
-                  <Text style={styles.likesText}>1</Text>
+                {/* Contenido del mensaje */}
+                <View style={styles.messageContentContainer}>
+                  <Text style={styles.messageContent}>{letter.message}</Text>
+                </View>
+                
+                {/* Corazones decorativos al final */}
+                <View style={styles.decorativeHearts}>
+                  <Heart width={24} height={24} color="#9F1239" fill="#9F1239" />
+                  <Heart width={20} height={20} color="#7C3AED" fill="#7C3AED" />
+                  <Heart width={16} height={16} color="#A78BFA" fill="#A78BFA" />
                 </View>
               </View>
             ))}
@@ -110,7 +134,7 @@ const FeedSection = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF1F2", // light pink background
+    backgroundColor: "#A78BFA", // Fondo morado como en la imagen
   },
   content: {
     padding: 16,
@@ -125,7 +149,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: "#4B5563", // gray-600
+    color: "#FFF", // Texto blanco sobre fondo morado
     textAlign: "center",
     marginBottom: 24,
   },
@@ -138,13 +162,13 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
-    borderRadius: 12,
+    backgroundColor: "#F5F3FF",
+    borderRadius: 24,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   emptyText: {
     fontSize: 16,
@@ -152,48 +176,75 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   messageList: {
-    gap: 16,
+    gap: 24,
   },
   messageCard: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: "#F5F3FF", // Fondo lavanda claro 
+    borderRadius: 24,
+    overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: 16,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 20,
   },
-  messageHeader: {
+  imageContainer: {
+    margin: 16,
+    marginTop: 8,
+    marginBottom: 16,
+    borderRadius: 16,
+    borderWidth: 3,
+    borderColor: "#7C3AED",
+    overflow: "hidden",
+  },
+  messageImage: {
+    width: "100%",
+    height: 240, // Altura adecuada para fotos
+    backgroundColor: "#F5F3FF",
+  },
+  cardHeader: {
+    padding: 16,
+  },
+  authorContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   messageAuthor: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#9F1239",
+    marginLeft: 8,
   },
-  messageDate: {
-    fontSize: 12,
-    color: "#9CA3AF",
-  },
-  messageContent: {
-    fontSize: 15,
-    color: "#4B5563",
-    lineHeight: 22,
-    marginBottom: 12,
-  },
-  messageLikes: {
+  dateContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  likesText: {
+  messageDate: {
     fontSize: 14,
-    color: "#9F1239",
+    color: "#7C3AED",
     marginLeft: 6,
+  },
+  messageContentContainer: {
+    backgroundColor: "#7C3AED", // Fondo morado oscuro para el mensaje
+    padding: 20,
+    borderRadius: 16,
+    margin: 16,
+    marginTop: 0,
+  },
+  messageContent: {
+    fontSize: 16,
+    color: "white", // Texto blanco sobre fondo morado
+    lineHeight: 24,
+  },
+  decorativeHearts: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 8,
   }
 });
 

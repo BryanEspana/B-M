@@ -39,10 +39,7 @@ const Index = () => {
         return <FeedSection />;
       default:
         return (
-          <LinearGradient 
-            colors={['#FFCDD2', '#FFE4E1', '#FFF0F0']} 
-            style={styles.homeContainer}
-          >
+          <View style={styles.homeContainer}>
             <ScrollView 
               contentContainerStyle={styles.homeContent}
               showsVerticalScrollIndicator={false}
@@ -95,7 +92,7 @@ const Index = () => {
                 </View>
               </View>
             </ScrollView>
-          </LinearGradient>
+          </View>
         );
     }
   };
@@ -120,7 +117,7 @@ export default Index;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1F2',
+    backgroundColor: 'transparent',
   },
   homeContainer: {
     flex: 1,
