@@ -64,8 +64,8 @@ const FeedSection = () => {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#9F1239"
-          colors={["#9F1239"]}
+          tintColor="#7e1785"
+          colors={["#7e1785"]}
         />
       }
     >
@@ -77,7 +77,7 @@ const FeedSection = () => {
         
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#9F1239" />
+            <ActivityIndicator size="large" color="#7e1785" />
           </View>
         ) : letters.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -90,12 +90,12 @@ const FeedSection = () => {
                 {/* Header con autor y fecha */}
                 <View style={styles.cardHeader}>
                   <View style={styles.authorContainer}>
-                    <Heart width={20} height={20} color="#9F1239" fill="#9F1239" />
+                    <Heart width={20} height={20} color="#7e1785" fill="#7e1785" />
                     <Text style={styles.messageAuthor}>{letter.author}</Text>
                   </View>
                   
                   <View style={styles.dateContainer}>
-                    <Calendar width={16} height={16} color="#7C3AED" />
+                    <Calendar width={16} height={16} color="#7e1785" />
                     <Text style={styles.messageDate}>{formatDate(letter.created_at)}</Text>
                   </View>
                 </View>
@@ -133,8 +133,7 @@ const FeedSection = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#A78BFA", // Fondo morado como en la imagen
+    flex: 1
   },
   content: {
     padding: 16,
@@ -143,13 +142,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#9F1239", // secondary color
+    color: "#7e1785", // secondary color
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "#FFF", // Texto blanco sobre fondo morado
+    color: "#936bc7", // Texto blanco sobre fondo morado
     textAlign: "center",
     marginBottom: 24,
   },
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
     padding: 40,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "white",
     borderRadius: 24,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   messageCard: {
-    backgroundColor: "#F5F3FF", // Fondo lavanda claro 
+    backgroundColor: "white", // Fondo lavanda claro 
     borderRadius: 24,
     overflow: "hidden",
     shadowColor: "#000",
@@ -201,7 +200,7 @@ const styles = StyleSheet.create({
   messageImage: {
     width: "100%",
     height: 240, // Altura adecuada para fotos
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "white",
   },
   cardHeader: {
     padding: 16,
@@ -214,7 +213,7 @@ const styles = StyleSheet.create({
   messageAuthor: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#9F1239",
+    color: "#7e1785",
     marginLeft: 8,
   },
   dateContainer: {

@@ -24,7 +24,7 @@ const BottomNavigation = React.forwardRef<View, BottomNavigationProps>(
             <Home
               width={24}
               height={24}
-              color={activeSection === "home" ? "#E11D48" : "#9F1239"}
+              color={activeSection === "home" ? "#7e1785" : "#936bc7"}
             />
             <Text
               style={[
@@ -43,7 +43,7 @@ const BottomNavigation = React.forwardRef<View, BottomNavigationProps>(
             <Music
               width={24}
               height={24}
-              color={activeSection === "music" ? "#E11D48" : "#9F1239"}
+              color={activeSection === "music" ? "#7e1785" : "#936bc7"}
             />
             <Text
               style={[
@@ -62,7 +62,7 @@ const BottomNavigation = React.forwardRef<View, BottomNavigationProps>(
             <FileText
               width={24}
               height={24}
-              color={activeSection === "diary" ? "#E11D48" : "#9F1239"}
+              color={activeSection === "diary" ? "#7e1785" : "#936bc7"}
             />
             <Text
               style={[
@@ -81,8 +81,8 @@ const BottomNavigation = React.forwardRef<View, BottomNavigationProps>(
             <Heart
               width={24}
               height={24}
-              color={activeSection === "feed" ? "#E11D48" : "#9F1239"}
-              fill={activeSection === "feed" ? "#E11D48" : "#9F1239"}
+              color={activeSection === "feed" ? "#7e1785" : "#936bc7"}
+              fill={activeSection === "feed" ? "#7e1785" : "#936bc7"}
             />
             <Text
               style={[
@@ -124,10 +124,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     fontWeight: "500",
-    color: "#9F1239",
+    color: "#936bc7",
   },
   activeNavText: {
-    color: "#E11D48",
+    color: "#7e1785",
   },
 });
 

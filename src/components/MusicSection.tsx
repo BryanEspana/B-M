@@ -16,7 +16,6 @@ interface MusicPlaylist {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF1F2", // light pink background
   },
   content: {
     padding: 16,
@@ -40,7 +39,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#9F1239", // secondary color
+    color: "#7e1785", // secondary color
     marginBottom: 8,
     textAlign: "center",
   },
@@ -51,7 +50,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   addButton: {
-    backgroundColor: "#9F1239",
+    backgroundColor: "#7e1785",
     borderRadius: 12,
     paddingVertical: 16,
     flexDirection: "row",
@@ -188,7 +187,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#F0FDF4",
+    backgroundColor: "#e4d1f2",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
   spotifyLink: {
     marginTop: 6,
     fontSize: 14,
-    color: "#1DB954",
+    color: "#7e1785",
     fontWeight: "500",
   },
   webViewContainer: {
@@ -398,9 +397,9 @@ const MusicSection = () => {
         <View style={styles.content}>
           {/* Iconos de música en la parte superior */}
           <View style={styles.headerIcons}>
-            <Music width={36} height={36} color="#9F1239" style={[styles.musicIcon, styles.leftMusicIcon]} />
-            <Music width={44} height={44} color="#9F1239" style={styles.musicIcon} />
-            <Music width={36} height={36} color="#9F1239" style={[styles.musicIcon, styles.rightMusicIcon]} />
+            <Music width={36} height={36} color="#7e1785" style={[styles.musicIcon, styles.leftMusicIcon]} />
+            <Music width={44} height={44} color="#7e1785" style={styles.musicIcon} />
+            <Music width={36} height={36} color="#7e1785" style={[styles.musicIcon, styles.rightMusicIcon]} />
           </View>
           
           <Text style={styles.title}>Nuestra Música</Text>
@@ -419,7 +418,7 @@ const MusicSection = () => {
         
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#9F1239" />
+            <ActivityIndicator size="large" color="#7e1785" />
           </View>
         ) : playlists.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -434,7 +433,7 @@ const MusicSection = () => {
               >
                 <View style={styles.playlistHeader}>
                   <View style={styles.playlistIconContainer}>
-                    <Music width={28} height={28} color="#1DB954" />
+                    <Music width={28} height={28} color="#7e1785" />
                   </View>
                   <View style={styles.playlistInfo}>
                     <Text style={styles.playlistName}>{playlist.name}</Text>

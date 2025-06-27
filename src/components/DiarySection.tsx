@@ -148,6 +148,17 @@ const DiarySection = () => {
     >
       <ScrollView style={styles.container}>
         <View style={styles.content}>
+             {/* Iconos de música en la parte superior */}
+             <View style={styles.headerIcons}>
+              <Heart width={36} height={36} color="#7e1785" style={[styles.headerIcons, styles.leftHeartIcon]} />
+              <Heart width={36} height={36} color="#7e1785" style={[styles.headerIcons, styles.centerHeartIcon]} />
+              <Heart width={36} height={36} color="#7e1785" style={[styles.headerIcons, styles.rightHeartIcon]} />
+          </View>
+          
+          <Text style={styles.title}>Enviame un mensaje</Text>
+          <Text style={styles.subtitle}>
+            Escribeme algo lindo que me quieras mandar, y preferiblemente manda una foto de tu carita jsjs
+          </Text>
           <View style={styles.formContainer}>
             <Text style={styles.inputLabel}>Escribe tu nombre</Text>
             <TextInput
@@ -164,7 +175,7 @@ const DiarySection = () => {
               style={styles.textInput}
               value={message}
               onChangeText={setMessage}
-              placeholder="Te quiero..."
+              placeholder="Aqui escribe algo como, te quiero..."
               multiline
               numberOfLines={6}
               placeholderTextColor="#A1A1AA"
@@ -188,8 +199,8 @@ const DiarySection = () => {
                 </View>
               ) : (
                 <View style={styles.imagePlaceholder}>
-                  <ImageIcon width={28} height={28} color="#7C3AED" />
-                  <Text style={styles.imagePlaceholderText}>Seleccionar foto (opcional)</Text>
+                  <ImageIcon width={28} height={28} color="#7e1785" />
+                  <Text style={styles.imagePlaceholderText}>Seleccionar foto (mandame una plis)</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -203,7 +214,7 @@ const DiarySection = () => {
               disabled={!message.trim() || !author.trim() || isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator size="small" color="#FFF" />
+                <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <View style={styles.submitButtonContent}>
                   <Text style={styles.submitButtonText}>Enviar</Text>
@@ -219,16 +230,49 @@ const DiarySection = () => {
 };
 
 const styles = StyleSheet.create({
+  headerIcons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#7e1785", // secondary color
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#4B5563",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  heartIcon: {
+    marginLeft: 8,
+  },
+  leftHeartIcon: {
+    marginLeft: 8,
+    opacity: 0.5,
+  },
+  centerHeartIcon: {
+    marginLeft: 8,
+    opacity: 1,
+  },
+  rightHeartIcon: {
+    marginLeft: 8,
+    opacity: 0.7,
+  },
   container: {
     flex: 1,
-    backgroundColor: "#A78BFA", // Fondo morado como en la imagen
   },
   content: {
     padding: 16,
     paddingBottom: 80, // Space for bottom navigation
   },
   formContainer: {
-    backgroundColor: "#F5F3FF", // Fondo lavanda claro
+    backgroundColor: "white", // Fondo lavanda claro
     borderRadius: 20,
     padding: 24,
     shadowColor: "#000",
@@ -240,13 +284,13 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#7C3AED", // Morado para las etiquetas
+    color: "#7e1785", // Morado para las etiquetas
     marginBottom: 8,
   },
   optionalText: {
     fontSize: 14,
     fontWeight: "400",
-    color: "#A78BFA", // Color más claro para indicar opcional
+    color: "#7e1785", // Color más claro para indicar opcional
     fontStyle: "italic",
   },
   authorInput: {
@@ -279,7 +323,7 @@ const styles = StyleSheet.create({
   imagePlaceholder: {
     height: 120,
     borderWidth: 2,
-    borderColor: "#7C3AED",
+    borderColor: "#7e1785",
     borderStyle: "dashed",
     borderRadius: 12,
     justifyContent: "center",
@@ -287,7 +331,7 @@ const styles = StyleSheet.create({
   },
   imagePlaceholderText: {
     marginTop: 8,
-    color: "#7C3AED",
+    color: "#7e1785",
     fontSize: 14,
     textAlign: "center",
   },
@@ -316,7 +360,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   submitButton: {
-    backgroundColor: "#9F1239",
+    backgroundColor: "#7e1785",
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
@@ -328,7 +372,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   submitButtonDisabled: {
-    backgroundColor: "#F9A8D4",
+    backgroundColor: "#936bc7",
   },
   submitButtonText: {
     color: "white",
@@ -336,9 +380,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: 6,
   },
-  heartIcon: {
-    marginLeft: 4,
-  },
+  
 });
 
 export default DiarySection;
