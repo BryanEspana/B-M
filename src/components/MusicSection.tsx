@@ -1,6 +1,7 @@
 import * as React from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking, RefreshControl } from "react-native";
-import { Music } from "lucide-react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking, RefreshControl, Dimensions, Modal, TextInput, Alert, Image } from "react-native";
+import { Music, X, Plus } from "lucide-react-native";
+import WebView from "react-native-webview";
 import { supabase } from "../integrations/supabase/client";
 
 interface MusicPlaylist {
@@ -15,16 +16,27 @@ interface MusicPlaylist {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF1F2", // light pink background
   },
   content: {
     padding: 16,
     paddingBottom: 80, // Space for bottom navigation
   },
+  headerIcons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  musicAnimation: {
+    width: 120,
+    height: 120,
+    marginBottom: 10,
+    resizeMode: 'contain',
+  },
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#9F1239", // secondary color
+    color: "#7e1785", // secondary color
     marginBottom: 8,
     textAlign: "center",
   },
@@ -33,6 +45,99 @@ const styles = StyleSheet.create({
     color: "#4B5563", // gray-600
     textAlign: "center",
     marginBottom: 24,
+  },
+  addButton: {
+    backgroundColor: "#7e1785",
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  addButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "85%",
+    backgroundColor: "#F5F3FF",
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#7C3AED",
+  },
+  closeButton: {
+    padding: 4,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#7C3AED",
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  submitButton: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  submitButtonText: {
+    color: "white",
+  },
+  cancelButtonText: {
+    color: "#4B5563",
   },
   loadingContainer: {
     padding: 40,
@@ -69,14 +174,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     marginBottom: 16,
+  },
+  playlistHeader: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 12,
   },
   playlistIconContainer: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#F0FDF4",
+    backgroundColor: "#e4d1f2",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
@@ -96,9 +204,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   spotifyLink: {
+    marginTop: 6,
     fontSize: 14,
-    color: "#1DB954",
+    color: "#7e1785",
     fontWeight: "500",
+  },
+  webViewContainer: {
+    width: "100%",
+    height: 380,
+    marginTop: 12,
+    borderRadius: 8,
+    overflow: "hidden",
   },
 });
 
@@ -106,6 +222,12 @@ const MusicSection = () => {
   const [playlists, setPlaylists] = React.useState<MusicPlaylist[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [newPlaylist, setNewPlaylist] = React.useState({
+    name: "",
+    description: "",
+    spotify_url: "",
+  });
 
   const fetchPlaylists = React.useCallback(async () => {
     try {
@@ -138,6 +260,21 @@ const MusicSection = () => {
     fetchPlaylists();
   }, [fetchPlaylists]);
 
+  const formatSpotifyEmbedUrl = (url: string): string => {
+    // Ejemplo: https://open.spotify.com/playlist/37i9dQZF1DX76t638V6CA8 -> https://open.spotify.com/embed/playlist/37i9dQZF1DX76t638V6CA8
+    try {
+      // Extraer el tipo (playlist/track/album) y el ID
+      const urlParts = url.split('/');
+      const spotifyType = urlParts[urlParts.length - 2]; // playlist, album o track
+      const spotifyId = urlParts[urlParts.length - 1].split('?')[0]; // ID sin parámetros adicionales
+      
+      return `https://open.spotify.com/embed/${spotifyType}/${spotifyId}`;
+    } catch (error) {
+      console.error('Error formateando URL de Spotify:', error);
+      return url; // Devolver la URL original en caso de error
+    }
+  };
+
   const openSpotifyLink = (url: string) => {
     Linking.canOpenURL(url).then(supported => {
       if (supported) {
@@ -148,27 +285,138 @@ const MusicSection = () => {
     });
   };
 
+  const handleAddPlaylist = async () => {
+    // Validación básica
+    if (!newPlaylist.name || !newPlaylist.spotify_url) {
+      Alert.alert("Error", "El nombre y la URL de Spotify son obligatorios");
+      return;
+    }
+
+    // Validar que la URL es de Spotify
+    if (!newPlaylist.spotify_url.includes("open.spotify.com")) {
+      Alert.alert("Error", "Por favor ingresa una URL válida de Spotify");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from("music_playlists")
+        .insert([{ 
+          name: newPlaylist.name, 
+          description: newPlaylist.description || null, 
+          spotify_url: newPlaylist.spotify_url 
+        }]);
+
+      if (error) throw error;
+
+      // Reset form and close modal
+      setNewPlaylist({ name: "", description: "", spotify_url: "" });
+      setModalVisible(false);
+      
+      // Refresh the playlist list
+      fetchPlaylists();
+
+    } catch (error) {
+      console.error("Error adding playlist:", error);
+      Alert.alert("Error", "No se pudo agregar la playlist. Inténtalo de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <ScrollView 
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor="#9F1239"
-          colors={["#9F1239"]}
-        />
-      }
-    >
-      <View style={styles.content}>
-        <Text style={styles.title}>Nuestra Música</Text>
-        <Text style={styles.subtitle}>
-          Las canciones que nos gustan y nos hemos dedicado
-        </Text>
+    <>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Agregar Playlist</Text>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <X width={24} height={24} color="#7C3AED" />
+              </TouchableOpacity>
+            </View>
+            
+            <Text style={styles.inputLabel}>Nombre de la playlist</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ej: Canciones románticas"
+              value={newPlaylist.name}
+              onChangeText={(text) => setNewPlaylist({...newPlaylist, name: text})}
+            />
+            
+            <Text style={styles.inputLabel}>URL de Spotify</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="https://open.spotify.com/playlist/..."
+              value={newPlaylist.spotify_url}
+              onChangeText={(text) => setNewPlaylist({...newPlaylist, spotify_url: text})}
+            />
+            
+            <View style={styles.buttonRow}>
+              <TouchableOpacity 
+                style={styles.submitButton} 
+                onPress={handleAddPlaylist}
+              >
+                <Text style={[styles.buttonText, styles.submitButtonText]}>Agregar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#9F1239"
+            colors={["#9F1239"]}
+          />
+        }
+      >
+        <View style={styles.content}>
+          {/* GIF de música en la parte superior */}
+          <View style={styles.headerIcons}>
+            <Image 
+              source={require('../assets/animations/music.gif')} 
+              style={styles.musicAnimation} 
+            />
+          </View>
+          
+          <Text style={styles.title}>Nuestra Música</Text>
+          <Text style={styles.subtitle}>
+            Las canciones que nos gustan y nos hemos dedicado
+          </Text>
+          
+          {/* Botón para agregar playlist */}
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Plus width={24} height={24} color="white" />
+            <Text style={styles.addButtonText}>Agregar Playlist</Text>
+          </TouchableOpacity>
         
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#9F1239" />
+            <ActivityIndicator size="large" color="#7e1785" />
           </View>
         ) : playlists.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -177,29 +425,51 @@ const MusicSection = () => {
         ) : (
           <View style={styles.playlistsContainer}>
             {playlists.map((playlist) => (
-              <TouchableOpacity 
+              <View 
                 key={playlist.id} 
                 style={styles.playlistCard}
-                onPress={() => openSpotifyLink(playlist.spotify_url)}
               >
-                <View style={styles.playlistIconContainer}>
-                  <Music width={28} height={28} color="#1DB954" />
+                <View style={styles.playlistHeader}>
+                  <View style={styles.playlistIconContainer}>
+                    <Music width={28} height={28} color="#7e1785" />
+                  </View>
+                  <View style={styles.playlistInfo}>
+                    <Text style={styles.playlistName}>{playlist.name}</Text>
+                    {playlist.description && (
+                      <Text style={styles.playlistDescription}>
+                        {playlist.description}
+                      </Text>
+                    )}
+                  </View>
                 </View>
-                <View style={styles.playlistInfo}>
-                  <Text style={styles.playlistName}>{playlist.name}</Text>
-                  {playlist.description && (
-                    <Text style={styles.playlistDescription}>
-                      {playlist.description}
-                    </Text>
-                  )}
+                
+                {/* Spotify Embed */}
+                <View style={styles.webViewContainer}>
+                  <WebView
+                    source={{ 
+                      uri: formatSpotifyEmbedUrl(playlist.spotify_url)
+                    }}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    startInLoadingState={true}
+                    scalesPageToFit={true}
+                    style={{ flex: 1, backgroundColor: 'transparent' }}
+                  />
+                </View>
+                
+                {/* Link para abrir en Spotify */}
+                <TouchableOpacity 
+                  onPress={() => openSpotifyLink(playlist.spotify_url)}
+                >
                   <Text style={styles.spotifyLink}>Abrir en Spotify</Text>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}
       </View>
     </ScrollView>
+    </>
   );
 };
 

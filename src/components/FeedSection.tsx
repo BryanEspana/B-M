@@ -1,6 +1,8 @@
 import * as React from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from "react-native";
-import { Heart } from "lucide-react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, Image, TouchableOpacity, Alert, ToastAndroid, Platform } from "react-native";
+import { Heart, Calendar, Download } from "lucide-react-native";
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { supabase } from "../integrations/supabase/client";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -51,9 +53,59 @@ const FeedSection = () => {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "d MMM yyyy", { locale: es });
+      return format(new Date(dateString), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es });
     } catch (error) {
       return dateString.split('T')[0]; // Fallback format
+    }
+  };
+
+  // Función para descargar y compartir imágenes
+  const handleDownloadImage = async (imageUrl: string, filename: string) => {
+    try {
+      // La URL puede venir como data:image/jpeg;base64,...
+      if (imageUrl.startsWith('data:')) {
+        const base64Data = imageUrl.split(',')[1];
+        const fileUri = FileSystem.documentDirectory + filename;
+        
+        await FileSystem.writeAsStringAsync(fileUri, base64Data, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(fileUri);
+        } else {
+          if (Platform.OS === 'android') {
+            ToastAndroid.show('¡Imagen guardada!', ToastAndroid.SHORT);
+          } else {
+            Alert.alert('Imagen guardada', 'La imagen ha sido guardada exitosamente');
+          }
+        }
+      } else {
+        // Para URLs externas
+        const downloadResumable = FileSystem.createDownloadResumable(
+          imageUrl,
+          FileSystem.documentDirectory + filename
+        );
+        
+        const result = await downloadResumable.downloadAsync();
+        if (!result) {
+          throw new Error('Error al descargar la imagen');
+        }
+        const { uri } = result;
+        
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri);
+        } else {
+          if (Platform.OS === 'android') {
+            ToastAndroid.show('¡Imagen guardada!', ToastAndroid.SHORT);
+          } else {
+            Alert.alert('Imagen guardada', 'La imagen ha sido guardada exitosamente');
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error al descargar o compartir la imagen:", error);
+      Alert.alert('Error', 'No se pudo descargar la imagen');
     }
   };
 
@@ -64,12 +116,21 @@ const FeedSection = () => {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#9F1239"
-          colors={["#9F1239"]}
+          tintColor="#7e1785"
+          colors={["#7e1785"]}
         />
       }
     >
       <View style={styles.content}>
+
+      <View style={styles.headerIcons}>
+        <Image 
+          source={require('../assets/animations/feed.gif')} 
+          style={styles.feedAnimation} 
+        />
+      </View>
+        
+
         <Text style={styles.title}>Nuestras Cartas</Text>
         <Text style={styles.subtitle}>
           Lee todos nuestros mensajes
@@ -77,7 +138,7 @@ const FeedSection = () => {
         
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#9F1239" />
+            <ActivityIndicator size="large" color="#7e1785" />
           </View>
         ) : letters.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -87,16 +148,46 @@ const FeedSection = () => {
           <View style={styles.messageList}>
             {letters.map((letter) => (
               <View key={letter.id} style={styles.messageCard}>
-                <View style={styles.messageHeader}>
-                  <Text style={styles.messageAuthor}>{letter.author}</Text>
-                  <Text style={styles.messageDate}>{formatDate(letter.created_at)}</Text>
+                {/* Header con autor y fecha */}
+                <View style={styles.cardHeader}>
+                  <View style={styles.authorContainer}>
+                    <Heart width={20} height={20} color="#7e1785" fill="#7e1785" />
+                    <Text style={styles.messageAuthor}>{letter.author}</Text>
+                  </View>
+                  
+                  <View style={styles.dateContainer}>
+                    <Calendar width={16} height={16} color="#7e1785" />
+                    <Text style={styles.messageDate}>{formatDate(letter.created_at)}</Text>
+                  </View>
                 </View>
                 
-                <Text style={styles.messageContent}>{letter.message}</Text>
+                {/* Imagen de la carta (si existe) */}
+                {letter.image_url && (
+                  <View style={styles.imageContainer}>
+                    <Image 
+                      source={{ uri: letter.image_url }} 
+                      style={styles.messageImage}
+                      resizeMode="contain"
+                    />
+                    <TouchableOpacity 
+                      style={styles.downloadButton}
+                      onPress={() => letter.image_url && handleDownloadImage(letter.image_url, `carta-${letter.id}.jpg`)}
+                    >
+                      <Download width={24} height={24} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                )}
                 
-                <View style={styles.messageLikes}>
-                  <Heart width={16} height={16} color="#E11D48" fill="#E11D48" />
-                  <Text style={styles.likesText}>1</Text>
+                {/* Contenido del mensaje */}
+                <View style={styles.messageContentContainer}>
+                  <Text style={styles.messageContent}>{letter.message}</Text>
+                </View>
+                
+                {/* Corazones decorativos al final */}
+                <View style={styles.decorativeHearts}>
+                  <Heart width={24} height={24} color="#9F1239" fill="#9F1239" />
+                  <Heart width={20} height={20} color="#7C3AED" fill="#7C3AED" />
+                  <Heart width={16} height={16} color="#A78BFA" fill="#A78BFA" />
                 </View>
               </View>
             ))}
@@ -108,9 +199,20 @@ const FeedSection = () => {
 };
 
 const styles = StyleSheet.create({
+  headerIcons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  feedAnimation: {
+    width: 120,
+    height: 120,
+    marginBottom: 10,
+    resizeMode: 'contain',
+  },
   container: {
-    flex: 1,
-    backgroundColor: "#FFF1F2", // light pink background
+    flex: 1
   },
   content: {
     padding: 16,
@@ -119,13 +221,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#9F1239", // secondary color
+    color: "#7e1785", // secondary color
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "#4B5563", // gray-600
+    color: "#936bc7", // Texto blanco sobre fondo morado
     textAlign: "center",
     marginBottom: 24,
   },
@@ -139,12 +241,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 24,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
   },
   emptyText: {
     fontSize: 16,
@@ -152,48 +254,95 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   messageList: {
-    gap: 16,
+    gap: 24,
   },
   messageCard: {
+    backgroundColor: "white", // Fondo lavanda claro 
+    borderRadius: 24,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 20,
+  },
+  imageContainer: {
+    margin: 16,
+    marginTop: 8,
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative",
+    backgroundColor: "#f0f0f0",
+    minHeight: 240,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  messageImage: {
+    width: "100%",
+    height: "auto",
+    minHeight: 240,
+    maxHeight: 400,
     backgroundColor: "white",
-    borderRadius: 12,
-    padding: 16,
+  },
+  downloadButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "#7e1785",
+    borderRadius: 30,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: 16,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
-  messageHeader: {
+  cardHeader: {
+    padding: 16,
+  },
+  authorContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   messageAuthor: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#9F1239",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#7e1785",
+    marginLeft: 8,
   },
-  messageDate: {
-    fontSize: 12,
-    color: "#9CA3AF",
-  },
-  messageContent: {
-    fontSize: 15,
-    color: "#4B5563",
-    lineHeight: 22,
-    marginBottom: 12,
-  },
-  messageLikes: {
+  dateContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  likesText: {
+  messageDate: {
     fontSize: 14,
-    color: "#9F1239",
+    color: "#7e1785",
     marginLeft: 6,
+  },
+  messageContentContainer: {
+    backgroundColor: "#7e1785", // Fondo morado oscuro para el mensaje
+    padding: 20,
+    borderRadius: 16,
+    margin: 16,
+    marginTop: 0,
+  },
+  messageContent: {
+    fontSize: 16,
+    color: "white"
+  },
+  decorativeHearts: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 8,
   }
 });
 

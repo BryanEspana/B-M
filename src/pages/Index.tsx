@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Animated } from 'react-native';
-import { Heart, Music, FileText } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Animated, Image } from 'react-native';
+import { Music, FileText, Heart } from 'lucide-react-native';
+import LottieView from 'lottie-react-native';
 import MusicSection from '../components/MusicSection';
 import DiarySection from '../components/DiarySection';
 import FeedSection from '../components/FeedSection';
@@ -11,6 +12,8 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   // Animation for heart pulse effect
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
+  // Para controlar qué tipo de animación mostrar: 'lottie' o 'gif'
+  const [animationType, setAnimationType] = useState('gif');
   
   React.useEffect(() => {
     Animated.loop(
@@ -39,27 +42,36 @@ const Index = () => {
         return <FeedSection />;
       default:
         return (
-          <LinearGradient 
-            colors={['#FFCDD2', '#FFE4E1', '#FFF0F0']} 
-            style={styles.homeContainer}
-          >
+          <View style={styles.homeContainer}>
             <ScrollView 
               contentContainerStyle={styles.homeContent}
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.centerContent}>
                 <View style={styles.heartContainer}>
-                  <Animated.View 
-                    style={{
-                      transform: [{ scale: pulseAnim }]
-                    }}
-                  >
-                    <Heart width={80} height={80} color="#E11D48" fill="#E11D48" />
-                  </Animated.View>
+                  {animationType === 'lottie' ? (
+                    <LottieView
+                      source={require('../assets/animations/pixel-heart.json')}
+                      autoPlay
+                      loop
+                      style={styles.lottieAnimation}
+                    />
+                  ) : (
+                    <Animated.View
+                      style={{
+                        transform: [{ scale: pulseAnim }]
+                      }}
+                    >
+                      <Image
+                        source={require('../assets/animations/pixel-heart.gif')}
+                        style={styles.heartAnimation}
+                      />
+                    </Animated.View>
+                  )}
                 </View>
                 
                 <View style={styles.textContainer}>
-                  <Text style={styles.title}>2 palabras 5 letras</Text>
+                  <Text style={styles.title}>Ð+M</Text>
                   <Text style={styles.subtitle}>
                     Te hice esto para que cada vez que me extrañes puedas ver todas nuestras cartas y canciones
                   </Text>
@@ -70,7 +82,7 @@ const Index = () => {
                     style={styles.menuButton}
                     onPress={() => setActiveSection('music')}
                   >
-                    <Music width={32} height={32} color="#E11D48" />
+                    <Music width={32} height={32} color="#7e1785" />
                     <Text style={styles.buttonTitle}>Nuestra Música</Text>
                     <Text style={styles.buttonSubtitle}>Las canciones que nos gustan y nos hemos dedicado</Text>
                   </TouchableOpacity>
@@ -79,7 +91,7 @@ const Index = () => {
                     style={styles.menuButton}
                     onPress={() => setActiveSection('diary')}
                   >
-                    <FileText width={32} height={32} color="#E11D48" />
+                    <FileText width={32} height={32} color="#7e1785" />
                     <Text style={styles.buttonTitle}>Escribir Carta</Text>
                     <Text style={styles.buttonSubtitle}>¿Me quieres decir algo?</Text>
                   </TouchableOpacity>
@@ -88,14 +100,14 @@ const Index = () => {
                     style={styles.menuButton}
                     onPress={() => setActiveSection('feed')}
                   >
-                    <Heart width={32} height={32} color="#E11D48" fill="#E11D48" />
+                    <Heart width={32} height={32} color="#7e1785" fill="#7e1785" />
                     <Text style={styles.buttonTitle}>Nuestras Cartas</Text>
                     <Text style={styles.buttonSubtitle}>Lee todos nuestros mensajes</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </ScrollView>
-          </LinearGradient>
+          </View>
         );
     }
   };
@@ -120,7 +132,16 @@ export default Index;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1F2',
+    backgroundColor: 'transparent',
+  },
+  lottieAnimation: {
+    width: 150,
+    height: 150,
+  },
+  heartAnimation: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   homeContainer: {
     flex: 1,
@@ -131,6 +152,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
   centerContent: {
     maxWidth: 400,
@@ -147,9 +169,9 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   title: {
-    fontSize: 32,
+    fontSize: 48,
     fontWeight: 'bold',
-    color: '#E11D48',
+    color: '#7e1785',
     marginBottom: 12,
     textAlign: 'center',
   },
@@ -179,13 +201,13 @@ const styles = StyleSheet.create({
   buttonTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#9F1239',
+    color: '#7e1785',
     marginTop: 12,
     marginBottom: 4,
   },
   buttonSubtitle: {
     fontSize: 14,
-    color: '#4B5563',
+    color: '#936bc7',
     textAlign: 'center',
   },
 });
