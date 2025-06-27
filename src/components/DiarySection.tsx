@@ -150,9 +150,9 @@ const DiarySection = () => {
         <View style={styles.content}>
              {/* Iconos de música en la parte superior */}
              <View style={styles.headerIcons}>
-              <Heart width={36} height={36} color="#7e1785" style={[styles.headerIcons, styles.leftHeartIcon]} />
-              <Heart width={36} height={36} color="#7e1785" style={[styles.headerIcons, styles.centerHeartIcon]} />
-              <Heart width={36} height={36} color="#7e1785" style={[styles.headerIcons, styles.rightHeartIcon]} />
+              <Heart width={20} height={20} color="#7e1785" style={[styles.headerIcons, styles.leftHeartIcon]} />
+              <Heart width={30} height={30} color="#7e1785" style={[styles.headerIcons, styles.centerHeartIcon]} />
+              <Heart width={20} height={20} color="#7e1785" style={[styles.headerIcons, styles.rightHeartIcon]} />
           </View>
           
           <Text style={styles.title}>Enviame un mensaje</Text>

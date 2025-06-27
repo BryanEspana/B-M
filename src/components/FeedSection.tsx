@@ -70,6 +70,14 @@ const FeedSection = () => {
       }
     >
       <View style={styles.content}>
+
+      <View style={styles.headerIcons}>
+        <Heart width={20} height={20} color="#7e1785" fill="#7e1785" style={[styles.headerIcons, styles.leftHeartIcon]} />
+        <Heart width={30} height={30} color="#7e1785" fill="#7e1785" style={[styles.headerIcons, styles.centerHeartIcon]} />
+        <Heart width={20} height={20} color="#7e1785" fill="#7e1785" style={[styles.headerIcons, styles.rightHeartIcon]} />
+      </View>
+        
+
         <Text style={styles.title}>Nuestras Cartas</Text>
         <Text style={styles.subtitle}>
           Lee todos nuestros mensajes
@@ -132,6 +140,24 @@ const FeedSection = () => {
 };
 
 const styles = StyleSheet.create({
+  headerIcons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  leftHeartIcon: {
+    marginRight: 8,
+    opacity: 0.5,
+  },
+  centerHeartIcon: {
+    opacity: 1,
+    marginRight: 8,
+  },
+  rightHeartIcon: {
+    opacity: 0.8,
+    marginRight: 8, 
+  },
   container: {
     flex: 1
   },
@@ -193,13 +219,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
     borderRadius: 16,
-    borderWidth: 3,
-    borderColor: "#7C3AED",
     overflow: "hidden",
   },
   messageImage: {
     width: "100%",
-    height: 240, // Altura adecuada para fotos
+    height: 240,
     backgroundColor: "white",
   },
   cardHeader: {
@@ -222,11 +246,11 @@ const styles = StyleSheet.create({
   },
   messageDate: {
     fontSize: 14,
-    color: "#7C3AED",
+    color: "#7e1785",
     marginLeft: 6,
   },
   messageContentContainer: {
-    backgroundColor: "#7C3AED", // Fondo morado oscuro para el mensaje
+    backgroundColor: "#7e1785", // Fondo morado oscuro para el mensaje
     padding: 20,
     borderRadius: 16,
     margin: 16,
@@ -234,8 +258,7 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     fontSize: 16,
-    color: "white", // Texto blanco sobre fondo morado
-    lineHeight: 24,
+    color: "white"
   },
   decorativeHearts: {
     flexDirection: "row",

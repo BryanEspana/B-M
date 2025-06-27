@@ -397,9 +397,9 @@ const MusicSection = () => {
         <View style={styles.content}>
           {/* Iconos de música en la parte superior */}
           <View style={styles.headerIcons}>
-            <Music width={36} height={36} color="#7e1785" style={[styles.musicIcon, styles.leftMusicIcon]} />
-            <Music width={44} height={44} color="#7e1785" style={styles.musicIcon} />
-            <Music width={36} height={36} color="#7e1785" style={[styles.musicIcon, styles.rightMusicIcon]} />
+            <Music width={20} height={20} color="#7e1785" style={[styles.musicIcon, styles.leftMusicIcon]} />
+            <Music width={30} height={30} color="#7e1785" style={styles.musicIcon} />
+            <Music width={20} height={20} color="#7e1785" style={[styles.musicIcon, styles.rightMusicIcon]} />
           </View>
           
           <Text style={styles.title}>Nuestra Música</Text>
