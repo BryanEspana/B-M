@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking, RefreshControl, Dimensions, Modal, TextInput, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking, RefreshControl, Dimensions, Modal, TextInput, Alert, Image } from "react-native";
 import { Music, X, Plus } from "lucide-react-native";
 import WebView from "react-native-webview";
 import { supabase } from "../integrations/supabase/client";
@@ -27,14 +27,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: "center",
   },
-  musicIcon: {
-    marginHorizontal: 8,
-  },
-  leftMusicIcon: {
-    opacity: 0.5,
-  },
-  rightMusicIcon: {
-    opacity: 0.7,
+  musicAnimation: {
+    width: 120,
+    height: 120,
+    marginBottom: 10,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 28,
@@ -395,11 +392,12 @@ const MusicSection = () => {
         }
       >
         <View style={styles.content}>
-          {/* Iconos de música en la parte superior */}
+          {/* GIF de música en la parte superior */}
           <View style={styles.headerIcons}>
-            <Music width={20} height={20} color="#7e1785" style={[styles.musicIcon, styles.leftMusicIcon]} />
-            <Music width={30} height={30} color="#7e1785" style={styles.musicIcon} />
-            <Music width={20} height={20} color="#7e1785" style={[styles.musicIcon, styles.rightMusicIcon]} />
+            <Image 
+              source={require('../assets/animations/music.gif')} 
+              style={styles.musicAnimation} 
+            />
           </View>
           
           <Text style={styles.title}>Nuestra Música</Text>

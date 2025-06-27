@@ -148,11 +148,12 @@ const DiarySection = () => {
     >
       <ScrollView style={styles.container}>
         <View style={styles.content}>
-             {/* Iconos de música en la parte superior */}
+             {/* GIF de mensaje en la parte superior */}
              <View style={styles.headerIcons}>
-              <Heart width={20} height={20} color="#7e1785" style={[styles.headerIcons, styles.leftHeartIcon]} />
-              <Heart width={30} height={30} color="#7e1785" style={[styles.headerIcons, styles.centerHeartIcon]} />
-              <Heart width={20} height={20} color="#7e1785" style={[styles.headerIcons, styles.rightHeartIcon]} />
+              <Image 
+                source={require('../assets/animations/message.gif')} 
+                style={styles.messageAnimation} 
+              />
           </View>
           
           <Text style={styles.title}>Enviame un mensaje</Text>
@@ -165,7 +166,7 @@ const DiarySection = () => {
               style={styles.authorInput}
               value={author}
               onChangeText={setAuthor}
-              placeholder="Nataly el amor de mi vida..."
+              placeholder="Nataly"
               placeholderTextColor="#A1A1AA"
               maxLength={50}
             />
@@ -175,7 +176,6 @@ const DiarySection = () => {
               style={styles.textInput}
               value={message}
               onChangeText={setMessage}
-              placeholder="Aqui escribe algo como, te quiero..."
               multiline
               numberOfLines={6}
               placeholderTextColor="#A1A1AA"
@@ -236,6 +236,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: "center",
   },
+  messageAnimation: {
+    width: 120,
+    height: 120,
+    marginBottom: 10,
+    resizeMode: 'contain',
+  },
   title: {
     fontSize: 28,
     fontWeight: "700",
@@ -252,18 +258,7 @@ const styles = StyleSheet.create({
   heartIcon: {
     marginLeft: 8,
   },
-  leftHeartIcon: {
-    marginLeft: 8,
-    opacity: 0.5,
-  },
-  centerHeartIcon: {
-    marginLeft: 8,
-    opacity: 1,
-  },
-  rightHeartIcon: {
-    marginLeft: 8,
-    opacity: 0.7,
-  },
+
   container: {
     flex: 1,
   },

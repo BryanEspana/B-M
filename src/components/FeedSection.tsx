@@ -72,9 +72,10 @@ const FeedSection = () => {
       <View style={styles.content}>
 
       <View style={styles.headerIcons}>
-        <Heart width={20} height={20} color="#7e1785" fill="#7e1785" style={[styles.headerIcons, styles.leftHeartIcon]} />
-        <Heart width={30} height={30} color="#7e1785" fill="#7e1785" style={[styles.headerIcons, styles.centerHeartIcon]} />
-        <Heart width={20} height={20} color="#7e1785" fill="#7e1785" style={[styles.headerIcons, styles.rightHeartIcon]} />
+        <Image 
+          source={require('../assets/animations/feed.gif')} 
+          style={styles.feedAnimation} 
+        />
       </View>
         
 
@@ -146,17 +147,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: "center",
   },
-  leftHeartIcon: {
-    marginRight: 8,
-    opacity: 0.5,
-  },
-  centerHeartIcon: {
-    opacity: 1,
-    marginRight: 8,
-  },
-  rightHeartIcon: {
-    opacity: 0.8,
-    marginRight: 8, 
+  feedAnimation: {
+    width: 120,
+    height: 120,
+    marginBottom: 10,
+    resizeMode: 'contain',
   },
   container: {
     flex: 1

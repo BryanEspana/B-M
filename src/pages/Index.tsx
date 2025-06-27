@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Animated } from 'react-native';
-import { Heart, Music, FileText } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Animated, Image } from 'react-native';
+import { Music, FileText, Heart } from 'lucide-react-native';
+import LottieView from 'lottie-react-native';
 import MusicSection from '../components/MusicSection';
 import DiarySection from '../components/DiarySection';
 import FeedSection from '../components/FeedSection';
@@ -11,6 +12,8 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   // Animation for heart pulse effect
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
+  // Para controlar qué tipo de animación mostrar: 'lottie' o 'gif'
+  const [animationType, setAnimationType] = useState('gif');
   
   React.useEffect(() => {
     Animated.loop(
@@ -46,13 +49,25 @@ const Index = () => {
             >
               <View style={styles.centerContent}>
                 <View style={styles.heartContainer}>
-                  <Animated.View 
-                    style={{
-                      transform: [{ scale: pulseAnim }]
-                    }}
-                  >
-                    <Heart width={80} height={80} color="#7e1785" fill="#7e1785" />
-                  </Animated.View>
+                  {animationType === 'lottie' ? (
+                    <LottieView
+                      source={require('../assets/animations/pixel-heart.json')}
+                      autoPlay
+                      loop
+                      style={styles.lottieAnimation}
+                    />
+                  ) : (
+                    <Animated.View
+                      style={{
+                        transform: [{ scale: pulseAnim }]
+                      }}
+                    >
+                      <Image
+                        source={require('../assets/animations/pixel-heart.gif')}
+                        style={styles.heartAnimation}
+                      />
+                    </Animated.View>
+                  )}
                 </View>
                 
                 <View style={styles.textContainer}>
@@ -118,6 +133,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  lottieAnimation: {
+    width: 150,
+    height: 150,
+  },
+  heartAnimation: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   homeContainer: {
     flex: 1,
