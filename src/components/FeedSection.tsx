@@ -1,6 +1,8 @@
 import * as React from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, Image } from "react-native";
-import { Heart, Calendar } from "lucide-react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, Image, TouchableOpacity, Alert, ToastAndroid, Platform } from "react-native";
+import { Heart, Calendar, Download } from "lucide-react-native";
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { supabase } from "../integrations/supabase/client";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -54,6 +56,56 @@ const FeedSection = () => {
       return format(new Date(dateString), "d 'de' MMMM 'de' yyyy HH:mm", { locale: es });
     } catch (error) {
       return dateString.split('T')[0]; // Fallback format
+    }
+  };
+
+  // Función para descargar y compartir imágenes
+  const handleDownloadImage = async (imageUrl: string, filename: string) => {
+    try {
+      // La URL puede venir como data:image/jpeg;base64,...
+      if (imageUrl.startsWith('data:')) {
+        const base64Data = imageUrl.split(',')[1];
+        const fileUri = FileSystem.documentDirectory + filename;
+        
+        await FileSystem.writeAsStringAsync(fileUri, base64Data, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(fileUri);
+        } else {
+          if (Platform.OS === 'android') {
+            ToastAndroid.show('¡Imagen guardada!', ToastAndroid.SHORT);
+          } else {
+            Alert.alert('Imagen guardada', 'La imagen ha sido guardada exitosamente');
+          }
+        }
+      } else {
+        // Para URLs externas
+        const downloadResumable = FileSystem.createDownloadResumable(
+          imageUrl,
+          FileSystem.documentDirectory + filename
+        );
+        
+        const result = await downloadResumable.downloadAsync();
+        if (!result) {
+          throw new Error('Error al descargar la imagen');
+        }
+        const { uri } = result;
+        
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri);
+        } else {
+          if (Platform.OS === 'android') {
+            ToastAndroid.show('¡Imagen guardada!', ToastAndroid.SHORT);
+          } else {
+            Alert.alert('Imagen guardada', 'La imagen ha sido guardada exitosamente');
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error al descargar o compartir la imagen:", error);
+      Alert.alert('Error', 'No se pudo descargar la imagen');
     }
   };
 
@@ -115,8 +167,14 @@ const FeedSection = () => {
                     <Image 
                       source={{ uri: letter.image_url }} 
                       style={styles.messageImage}
-                      resizeMode="cover"
+                      resizeMode="contain"
                     />
+                    <TouchableOpacity 
+                      style={styles.downloadButton}
+                      onPress={() => letter.image_url && handleDownloadImage(letter.image_url, `carta-${letter.id}.jpg`)}
+                    >
+                      <Download width={24} height={24} color="white" />
+                    </TouchableOpacity>
                   </View>
                 )}
                 
@@ -215,11 +273,34 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 16,
     overflow: "hidden",
+    position: "relative",
+    backgroundColor: "#f0f0f0",
+    minHeight: 240,
+    justifyContent: "center",
+    alignItems: "center",
   },
   messageImage: {
     width: "100%",
-    height: 240,
+    height: "auto",
+    minHeight: 240,
+    maxHeight: 400,
     backgroundColor: "white",
+  },
+  downloadButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "#7e1785",
+    borderRadius: 30,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   cardHeader: {
     padding: 16,
